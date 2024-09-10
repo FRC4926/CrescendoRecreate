@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -78,6 +79,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("AAAAFrontLeftPosition",  m_frontLeft.getAbsolutePositionEncoder());
+    SmartDashboard.putNumber("AAAAFrontRightPosition", m_frontRight.getAbsolutePositionEncoder());
+    SmartDashboard.putNumber("AAAARearLeftPosition",   m_rearLeft.getAbsolutePositionEncoder());
+    SmartDashboard.putNumber("AAAARearRightPosition",  m_rearRight.getAbsolutePositionEncoder());
+    SmartDashboard.putNumber("Gyro Postion",(m_gyro.getYaw().getValueAsDouble()*Math.PI)/180);
+    SmartDashboard.putString("Odemetry Angle", m_odometry.getPoseMeters().getRotation().toString());
+
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),

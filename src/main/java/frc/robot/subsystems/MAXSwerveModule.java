@@ -14,6 +14,7 @@ import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import frc.robot.Constants.ModuleConstants;
@@ -49,6 +50,9 @@ public class MAXSwerveModule {
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
     m_drivingEncoder = m_drivingSparkMax.getEncoder();
     m_turningEncoder = new CANcoder(encoderCANId);
+    // MagnetSensorConfigs msc = new MagnetSensorConfigs();
+    // msc.MagnetOffset = 0.5;
+    // m_turningEncoder.getConfigurator().apply(msc);
     m_drivingPIDController = m_drivingSparkMax.getPIDController();
     m_turningPIDController = m_turningSparkMax.getPIDController();
     m_drivingPIDController.setFeedbackDevice(m_drivingEncoder);
