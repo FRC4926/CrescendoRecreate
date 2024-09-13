@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -27,7 +29,12 @@ public class MAXSwerveModule {
   private final CANcoder m_turningEncoder;
 
   private final SparkPIDController m_drivingPIDController;
-  private final SparkPIDController m_turningPIDController;
+  // private final SparkPIDController m_turningPIDController;
+  private final PIDController m_turningPIDController;
+
+  private final String m_name;
+
+  private double m_turningSetpoint = 0;
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
@@ -38,7 +45,10 @@ public class MAXSwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, int encoderCANId, double chassisAngularOffset) {
+  public MAXSwerveModule(String name, int drivingCANId, int turningCANId, int encoderCANId, double chassisAngularOffset) {
+    m_name = name;
+
+
     m_drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -54,7 +64,7 @@ public class MAXSwerveModule {
     // msc.MagnetOffset = 0.5;
     // m_turningEncoder.getConfigurator().apply(msc);
     m_drivingPIDController = m_drivingSparkMax.getPIDController();
-    m_turningPIDController = m_turningSparkMax.getPIDController();
+    // m_turningPIDController = m_turningSparkMax.getPIDController();
     m_drivingPIDController.setFeedbackDevice(m_drivingEncoder);
     //m_turningPIDController.setFeedbackDevice(m_turningEncoder);
 
@@ -79,9 +89,12 @@ public class MAXSwerveModule {
     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
     // to 10 degrees will go through 0 rather than the other direction which is a
     // longer route.
-    m_turningPIDController.setPositionPIDWrappingEnabled(true);
-    m_turningPIDController.setPositionPIDWrappingMinInput(ModuleConstants.kTurningEncoderPositionPIDMinInput);
-    m_turningPIDController.setPositionPIDWrappingMaxInput(ModuleConstants.kTurningEncoderPositionPIDMaxInput);
+    // m_turningPIDController.setPositionPIDWrappingEnabled(true);
+    // m_turningPIDController.setPositionPIDWrappingMinInput(ModuleConstants.kTurningEncoderPositionPIDMinInput);
+    // m_turningPIDController.setPositionPIDWrappingMaxInput(ModuleConstants.kTurningEncoderPositionPIDMaxInput);
+
+    // m_turningPIDController = new PIDController(ModuleConstants.kTurningP, ModuleConstants.kTurningI, ModuleConstants.kTurningD);
+    m_turningPIDController = new PIDController(2.0, 0.0, 0.0);
 
     // Set the PID gains for the driving motor. Note these are example gains, and you
     // may need to tune them for your own robot!
@@ -94,12 +107,12 @@ public class MAXSwerveModule {
 
     // Set the PID gains for the turning motor. Note these are example gains, and you
     // may need to tune them for your own robot!
-    m_turningPIDController.setP(ModuleConstants.kTurningP);
-    m_turningPIDController.setI(ModuleConstants.kTurningI);
-    m_turningPIDController.setD(ModuleConstants.kTurningD);
-    m_turningPIDController.setFF(ModuleConstants.kTurningFF);
-    m_turningPIDController.setOutputRange(ModuleConstants.kTurningMinOutput,
-        ModuleConstants.kTurningMaxOutput);
+    // m_turningPIDController.setP(ModuleConstants.kTurningP);
+    // m_turningPIDController.setI(ModuleConstants.kTurningI);
+    // m_turningPIDController.setD(ModuleConstants.kTurningD);
+    // m_turningPIDController.setFF(ModuleConstants.kTurningFF);
+    // m_turningPIDController.setOutputRange(ModuleConstants.kTurningMinOutput,
+    //     ModuleConstants.kTurningMaxOutput);
 
     m_drivingSparkMax.setIdleMode(ModuleConstants.kDrivingMotorIdleMode);
     m_turningSparkMax.setIdleMode(ModuleConstants.kTurningMotorIdleMode);
@@ -168,9 +181,20 @@ public class MAXSwerveModule {
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
     m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-    m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+    // m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+    // m_turningPIDController.setSetpoint(optimizedDesiredState.angle.getRotations());
+    m_turningSetpoint = optimizedDesiredState.angle.getRotations();
+
+    SmartDashboard.putNumber(m_name + "DesiredSpeed", optimizedDesiredState.speedMetersPerSecond);
+    SmartDashboard.putNumber(m_name + "DesiredOrientation", optimizedDesiredState.angle.getDegrees());
 
     m_desiredState = desiredState;
+  }
+
+  public void periodic() {
+    double calculated = m_turningPIDController.calculate(getAbsolutePositionEncoder()/(2*Math.PI), m_turningSetpoint);
+    SmartDashboard.putNumber(m_name + "PIDCalculated", calculated);
+    m_turningSparkMax.set(calculated);
   }
 
   /** Zeroes all the SwerveModule encoders. */

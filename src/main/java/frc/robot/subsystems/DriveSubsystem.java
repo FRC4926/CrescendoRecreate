@@ -25,25 +25,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule("FrontLeft",
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftEncoderCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  private final MAXSwerveModule m_frontRight = new MAXSwerveModule("FrontRight",
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightEncoderCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule("RearLeft",
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kRearLeftEncoderCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  private final MAXSwerveModule m_rearRight = new MAXSwerveModule("RearRight",
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kRearRightEncoderCanId,
@@ -79,12 +79,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("AAAAFrontLeftPosition",  m_frontLeft.getAbsolutePositionEncoder());
-    SmartDashboard.putNumber("AAAAFrontRightPosition", m_frontRight.getAbsolutePositionEncoder());
-    SmartDashboard.putNumber("AAAARearLeftPosition",   m_rearLeft.getAbsolutePositionEncoder());
-    SmartDashboard.putNumber("AAAARearRightPosition",  m_rearRight.getAbsolutePositionEncoder());
-    SmartDashboard.putNumber("Gyro Postion",(m_gyro.getYaw().getValueAsDouble()*Math.PI)/180);
-    SmartDashboard.putString("Odemetry Angle", m_odometry.getPoseMeters().getRotation().toString());
+    m_frontLeft.periodic();
+    m_frontRight.periodic();
+    m_rearLeft.periodic();
+    m_rearRight.periodic();
+
+
+    SmartDashboard.putNumber("FrontLeftPosition",  m_frontLeft.getAbsolutePositionEncoder()*(180/Math.PI));
+    SmartDashboard.putNumber("FrontRightPosition", m_frontRight.getAbsolutePositionEncoder()*(180/Math.PI));
+    SmartDashboard.putNumber("RearLeftPosition",   m_rearLeft.getAbsolutePositionEncoder()*(180/Math.PI));
+    SmartDashboard.putNumber("RearRightPosition",  m_rearRight.getAbsolutePositionEncoder()*(180/Math.PI));
+    SmartDashboard.putNumber("Gyro Postion",       m_gyro.getYaw().getValueAsDouble());
+    SmartDashboard.putString("Odemetry Angle",     m_odometry.getPoseMeters().getRotation().toString());
 
     // Update the odometry in the periodic block
     m_odometry.update(
