@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ModuleConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -91,6 +92,8 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("RearRightPosition",  m_rearRight.getAbsolutePositionEncoder()*(180/Math.PI));
     SmartDashboard.putNumber("Gyro Postion",       m_gyro.getYaw().getValueAsDouble());
     SmartDashboard.putString("Odemetry Angle",     m_odometry.getPoseMeters().getRotation().toString());
+
+ 
 
     // Update the odometry in the periodic block
     m_odometry.update(

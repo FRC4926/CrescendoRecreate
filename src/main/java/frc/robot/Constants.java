@@ -109,9 +109,10 @@ public final class Constants {
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
-    public static final double kTurningP = 5;
-    public static final double kTurningI = 0;
-    public static final double kTurningD = 0;
+    public static double kTurningP = 3;
+    public static double kTurningI = 0;
+    public static double kTurningD = 0;
+    public static double FLTurningP = 2;
     public static final double kTurningFF = 0;
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
@@ -119,7 +120,7 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 20; // amps
+    public static final int kDrivingMotorCurrentLimit = 50; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 

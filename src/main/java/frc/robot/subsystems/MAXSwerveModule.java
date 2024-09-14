@@ -93,8 +93,10 @@ public class MAXSwerveModule {
     // m_turningPIDController.setPositionPIDWrappingMinInput(ModuleConstants.kTurningEncoderPositionPIDMinInput);
     // m_turningPIDController.setPositionPIDWrappingMaxInput(ModuleConstants.kTurningEncoderPositionPIDMaxInput);
 
-    // m_turningPIDController = new PIDController(ModuleConstants.kTurningP, ModuleConstants.kTurningI, ModuleConstants.kTurningD);
-    m_turningPIDController = new PIDController(2.0, 0.0, 0.0);
+    m_turningPIDController = new PIDController(ModuleConstants.kTurningP, ModuleConstants.kTurningI, ModuleConstants.kTurningD);
+    
+    // m_turningPIDController = new PIDController(2.0, 0.0, 0.0);
+    m_turningPIDController.enableContinuousInput(-0.5, 0.5);
 
     // Set the PID gains for the driving motor. Note these are example gains, and you
     // may need to tune them for your own robot!
@@ -192,7 +194,18 @@ public class MAXSwerveModule {
   }
 
   public void periodic() {
-    double calculated = m_turningPIDController.calculate(getAbsolutePositionEncoder()/(2*Math.PI), m_turningSetpoint);
+    // if (m_name.equals("FrontLeft"))
+    // {
+    //   m_turningPIDController.setP(ModuleConstants.FLTurningP);
+    // } else
+    // {p
+       m_turningPIDController.setP(ModuleConstants.kTurningP);
+    // }
+
+    double absolutePosition = m_turningEncoder.getAbsolutePosition().getValueAsDouble();
+    SmartDashboard.putNumber(m_name + "absolutePositionRotations", absolutePosition);
+    
+    double calculated = m_turningPIDController.calculate(absolutePosition, m_turningSetpoint);
     SmartDashboard.putNumber(m_name + "PIDCalculated", calculated);
     m_turningSparkMax.set(calculated);
   }
