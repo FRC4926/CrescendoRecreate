@@ -15,6 +15,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -143,6 +144,10 @@ public class MAXSwerveModule {
         new Rotation2d(getAbsolutePositionEncoder() - m_chassisAngularOffset));
   }
 
+  public SwerveModuleState getDesiredState() {
+    return m_desiredState;
+  }
+
   public double getAbsolutePositionEncoder()
   {
     return m_turningEncoder.getAbsolutePosition().getValueAsDouble()*2*Math.PI;
@@ -172,6 +177,7 @@ public class MAXSwerveModule {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
+
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -191,6 +197,20 @@ public class MAXSwerveModule {
     SmartDashboard.putNumber(m_name + "DesiredOrientation", optimizedDesiredState.angle.getDegrees());
 
     m_desiredState = desiredState;
+  }
+  
+  public void stopMotor()
+  {
+    double cushion = 0.01;
+    m_drivingSparkMax.setIdleMode(IdleMode.kBrake);
+    if (Math.abs(m_drivingSparkMax.get()) >= cushion)
+    {
+      if (m_drivingSparkMax.get() < 0)
+        m_drivingSparkMax.set(m_drivingSparkMax.get() + cushion);
+      else
+        m_drivingSparkMax.set(m_drivingSparkMax.get() - cushion);
+    } else
+        m_drivingSparkMax.set(0);
   }
 
   public void periodic() {

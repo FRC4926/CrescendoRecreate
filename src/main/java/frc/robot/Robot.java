@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SmartDashboard.putNumber("PIDTurning", ModuleConstants.kTurningP);
-    SmartDashboard.putNumber("PIDTurningFL", ModuleConstants.FLTurningP);  
+    //SmartDashboard.putNumber("PIDTurningFL", ModuleConstants.FLTurningP);  
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     ModuleConstants.kTurningP = SmartDashboard.getNumber("PIDTurning", ModuleConstants.kTurningP);
-    ModuleConstants.FLTurningP = SmartDashboard.getNumber("PIDTurningFL", ModuleConstants.kTurningP);
+    //ModuleConstants.FLTurningP = SmartDashboard.getNumber("PIDTurningFL", ModuleConstants.kTurningP);
   }
 
   @Override

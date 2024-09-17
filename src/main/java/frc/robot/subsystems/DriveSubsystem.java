@@ -10,11 +10,15 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
@@ -63,6 +67,18 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
+  private StructArrayPublisher<SwerveModuleState> actualPublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("ActualStates", SwerveModuleState.struct).publish();
+
+  private StructArrayPublisher<SwerveModuleState> desiredPublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("DesiredStates", SwerveModuleState.struct).publish();
+
+  private StructPublisher<Rotation2d> orientationPublisher = NetworkTableInstance.getDefault()
+    .getStructTopic("Orientation", Rotation2d.struct).publish();
+
+  private StructPublisher<Translation2d> posePublisher = NetworkTableInstance.getDefault()
+    .getStructTopic("Pose", Translation2d.struct).publish();
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -93,8 +109,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Gyro Postion",       m_gyro.getYaw().getValueAsDouble());
     SmartDashboard.putString("Odemetry Angle",     m_odometry.getPoseMeters().getRotation().toString());
 
- 
-
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()),
@@ -104,6 +118,26 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    SwerveModuleState[] actualStates = new SwerveModuleState[] {
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    };
+
+    SwerveModuleState[] desiredStates = new SwerveModuleState[] {
+      m_frontLeft.getDesiredState(),
+      m_frontRight.getDesiredState(),
+      m_rearLeft.getDesiredState(),
+      m_rearRight.getDesiredState()
+    };
+
+    actualPublisher.set(actualStates);
+    desiredPublisher.set(desiredStates);
+    orientationPublisher.set(Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
+    posePublisher.set(getPose().getTranslation());
+
   }
 
   /**
@@ -147,6 +181,8 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedCommanded;
     double ySpeedCommanded;
 
+    if (!(Math.abs(xSpeed) <= 0.05 && Math.abs(ySpeed) <= 0.05 && Math.abs(rot) <= 0.05))
+    {
     if (rateLimit) {
       // Convert XY to polar for rate limiting
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
@@ -210,6 +246,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
+  } else
+  {
+    m_frontLeft.stopMotor();
+    m_frontRight.stopMotor();
+    m_rearLeft.stopMotor();
+    m_rearRight.stopMotor();
+  }
   }
 
   /**
