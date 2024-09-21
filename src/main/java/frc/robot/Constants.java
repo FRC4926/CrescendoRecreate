@@ -30,7 +30,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
-    public static final double kDirectionSlewRate = 1.2; // radians per second
+    public static final double kDirectionSlewRate = Math.PI; // radians per second
+    //public static final double kDirectionFastSlewRate = 3.6; // When the bumper is pressed
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
@@ -68,6 +69,10 @@ public final class Constants {
     public static final int kFrontRightEncoderCanId = 11;
     public static final int kRearRightEncoderCanId = 12;
 
+    public static final double kOrientationP = 1.0;
+    public static final double kOrientationI = 0.0;
+    public static final double kOrientationD = 0.0;
+
 
     public static final boolean kGyroReversed = false;
   }
@@ -102,7 +107,7 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    public static final double kDrivingP = 0.18;
+    public static final double kDrivingP = 0.04;
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
     public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;

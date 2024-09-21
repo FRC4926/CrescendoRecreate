@@ -39,6 +39,7 @@ public class MAXSwerveModule {
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
+  private SwerveModuleState m_optimizedDesiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -81,6 +82,7 @@ public class MAXSwerveModule {
 
     // m_turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderPositionFactor);
     // m_turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderVelocityFactor);
+
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
@@ -148,6 +150,10 @@ public class MAXSwerveModule {
     return m_desiredState;
   }
 
+  public SwerveModuleState getOptimizedState() {
+    return m_optimizedDesiredState;
+  }
+
   public double getAbsolutePositionEncoder()
   {
     return m_turningEncoder.getAbsolutePosition().getValueAsDouble()*2*Math.PI;
@@ -178,7 +184,7 @@ public class MAXSwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState) {
 
-    // Apply chassis angular offset to the desired state.
+    // Apply chassis  offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
@@ -197,6 +203,7 @@ public class MAXSwerveModule {
     SmartDashboard.putNumber(m_name + "DesiredOrientation", optimizedDesiredState.angle.getDegrees());
 
     m_desiredState = desiredState;
+    m_optimizedDesiredState = optimizedDesiredState;
   }
   
   public void stopMotor()

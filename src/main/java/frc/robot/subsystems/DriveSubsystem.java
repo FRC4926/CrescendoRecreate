@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -72,12 +73,27 @@ public class DriveSubsystem extends SubsystemBase {
 
   private StructArrayPublisher<SwerveModuleState> desiredPublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("DesiredStates", SwerveModuleState.struct).publish();
+  
+  private StructArrayPublisher<SwerveModuleState> optimizedPublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("OptimizedDesiredStates", SwerveModuleState.struct).publish();
 
   private StructPublisher<Rotation2d> orientationPublisher = NetworkTableInstance.getDefault()
     .getStructTopic("Orientation", Rotation2d.struct).publish();
 
-  private StructPublisher<Translation2d> posePublisher = NetworkTableInstance.getDefault()
-    .getStructTopic("Pose", Translation2d.struct).publish();
+  private StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+    .getStructTopic("Pose", Pose2d.struct).publish();
+
+
+  // This is a reference `desiredOrientation` to set the robot to.
+  // It changes when the right joystick wants to make the robot turn.
+  // It is used because if strafing causes the robot to acidentally change orientation,
+  // it can use PID to get back\ to the desired orientation.
+  private Rotation2d m_desiredOrientation = new Rotation2d(0);
+  private PIDController orientationPIDController = new PIDController(
+    DriveConstants.kOrientationP,
+    DriveConstants.kOrientationI,
+    DriveConstants.kOrientationD
+  );
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -89,7 +105,8 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
-
+      
+  
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
   }
@@ -133,10 +150,18 @@ public class DriveSubsystem extends SubsystemBase {
       m_rearRight.getDesiredState()
     };
 
+    SwerveModuleState[] optimizedStates = new SwerveModuleState[] {
+      m_frontLeft.getOptimizedState(),
+      m_frontRight.getOptimizedState(),
+      m_rearLeft.getOptimizedState(),
+      m_rearRight.getOptimizedState()
+    };
+
     actualPublisher.set(actualStates);
     desiredPublisher.set(desiredStates);
+    optimizedPublisher.set(optimizedStates);
     orientationPublisher.set(Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()));
-    posePublisher.set(getPose().getTranslation());
+    posePublisher.set(getPose());
 
   }
 
@@ -181,8 +206,13 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedCommanded;
     double ySpeedCommanded;
 
-    if (!(Math.abs(xSpeed) <= 0.05 && Math.abs(ySpeed) <= 0.05 && Math.abs(rot) <= 0.05))
-    {
+    if (Math.abs(xSpeed) <= 0.05 && Math.abs(ySpeed) <= 0.05 && Math.abs(rot) <= 0.05) {
+      m_frontLeft.stopMotor();
+      m_frontRight.stopMotor();
+      m_rearLeft.stopMotor();
+      m_rearRight.stopMotor();
+      return;
+    }
     if (rateLimit) {
       // Convert XY to polar for rate limiting
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
@@ -236,6 +266,8 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
+    // m_desiredOrientation = m_desiredOrientation.plus(Rotation2d.fromRadians(rotDelivered));
+
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()))
@@ -246,13 +278,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
-  } else
-  {
-    m_frontLeft.stopMotor();
-    m_frontRight.stopMotor();
-    m_rearLeft.stopMotor();
-    m_rearRight.stopMotor();
-  }
   }
 
   /**
