@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -34,6 +36,8 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final ShooterSubsystem m_robotShooter = new ShooterSubsystem();
+  public final ArmSubsystem m_robotArm = new ArmSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -50,12 +54,26 @@ public class RobotContainer {
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
-            () -> m_robotDrive.drive(
+            () -> {
+                m_robotDrive.drive(
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true, true),
+                true, true);
+
+                // final double rt = m_driverController.getRightTriggerAxis();
+                // m_robotShooter.convey(2*(rt-0.5));
+            },
             m_robotDrive));
+    
+    m_robotArm.setDefaultCommand(new RunCommand(() -> {
+        if (m_driverController.getPOV() != -1) {
+            m_robotArm.reset();
+        }
+
+        final double rt = m_driverController.getRightTriggerAxis();
+        m_robotArm.goToAngle(Rotation2d.fromRotations(rt));
+    }, m_robotArm));
   }
 
   /**

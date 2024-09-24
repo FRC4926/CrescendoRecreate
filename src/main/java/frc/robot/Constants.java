@@ -53,7 +53,7 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = 0;//Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 1;
+    public static final int kFrontLeftDrivingCanId = 1000;
     public static final int kRearLeftDrivingCanId = 2;
     public static final int kFrontRightDrivingCanId = 3;
     public static final int kRearRightDrivingCanId = 4;
@@ -151,5 +151,28 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  }
+
+  public static final class ShooterConstants {
+    public static final int kUpperMotorCanId = 1234;
+    public static final int kLowerMotorCanId = 5678;
+    public static final int kConveyorMotorCanId = 15;
+    public static final int kIntakeMotorCanId = 39230329;
+
+    public static final double kUpperMotorP = 1.0;
+    public static final double kUpperMotorI = 0.0;
+    public static final double kUpperMotorD = 0.0;
+
+    public static final double kLowerMotorP = 1.0;
+    public static final double kLowerMotorI = 0.0;
+    public static final double kLowerMotorD = 0.0;
+  }
+
+  public static final class ArmConstants {
+    public static final int kArmMotorCanId = 1;
+
+    public static final double kArmMotorP = 1.0;
+    public static final double kArmMotorI = 0.0;
+    public static final double kArmMotorD = 0.0;
   }
 }
