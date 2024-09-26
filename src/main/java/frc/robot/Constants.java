@@ -171,7 +171,8 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kArmMotorCanId = 1;
 
-    public static final double kArmMotorP = 1.0;
+    public static final double kArmMotorP = 0.2;
+    ;
     public static final double kArmMotorI = 0.0;
     public static final double kArmMotorD = 0.0;
   }

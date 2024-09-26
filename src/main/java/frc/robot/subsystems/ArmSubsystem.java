@@ -5,8 +5,11 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -16,6 +19,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final PIDController armPIDController = new PIDController(
         ArmConstants.kArmMotorP, ArmConstants.kArmMotorI, ArmConstants.kArmMotorD
     );
+    private final double startTime = WPIUtilJNI.now();
     private double setpoint = 0.0;
     public ArmSubsystem() {
         armEncoder.setPosition(0.0);
@@ -35,6 +39,13 @@ public class ArmSubsystem extends SubsystemBase {
         return armPIDController.atSetpoint();
     }
     public void periodic() {
-        armSparkMax.set(armPIDController.calculate(armEncoder.getPosition(), setpoint));
+        double output = armEncoder.getPosition();
+        double input = armPIDController.calculate(output, setpoint);
+        // armSparkMax.set(armPIDController.calculate(armEncoder.getPosition(), setpoint));
+        SmartDashboard.putNumber("armOutput", output);
+        SmartDashboard.putNumber("armInput", input);
+    }
+    public void sendData() {
+
     }
 }
