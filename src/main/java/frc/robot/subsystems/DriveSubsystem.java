@@ -54,7 +54,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kRearRightEncoderCanId,
       DriveConstants.kBackRightChassisAngularOffset);
-
+  
   // The gyro sensor
   private final Pigeon2 m_gyro = new Pigeon2(13);
   private final Pigeon2Configuration gyroConfig = new Pigeon2Configuration();
@@ -63,6 +63,8 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_currentRotation = 0.0;
   private double m_currentTranslationDir = 0.0;
   private double m_currentTranslationMag = 0.0;
+
+  private int m_speedStage = DriveConstants.kTeleopDefaultSpeedStage;
 
   private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
@@ -109,6 +111,21 @@ public class DriveSubsystem extends SubsystemBase {
   
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+  }
+
+  public int getSpeedStage() {
+    return m_speedStage;
+  }
+  public void incrementSpeedStage() {
+    if (m_speedStage < DriveConstants.kMaxSpeedStages.length - 1)
+      m_speedStage++;
+  }
+  public void decrementSpeedStage() {
+    if (m_speedStage > 0)
+      m_speedStage--;
+  }
+  public void setSpeedStage(int speedStage) {
+    m_speedStage = speedStage;
   }
 
   @Override
@@ -262,9 +279,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
+    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedStages[m_speedStage];
+    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedStages[m_speedStage];
+    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeedStages[m_speedStage];
 
     // m_desiredOrientation = m_desiredOrientation.plus(Rotation2d.fromRadians(rotDelivered));
 
@@ -273,7 +290,7 @@ public class DriveSubsystem extends SubsystemBase {
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        swerveModuleStates, DriveConstants.kMaxSpeedStages[m_speedStage]);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -297,7 +314,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        desiredStates, DriveConstants.kMaxSpeedStages[m_speedStage]);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);

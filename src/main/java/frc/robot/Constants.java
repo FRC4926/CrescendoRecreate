@@ -27,8 +27,24 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    // public static final double kMaxSpeedMetersPerSecond = 4.8;
+    // public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    
+    // The controller can use buttons to switch between each stage
+    public static final double[] kMaxSpeedStages = {
+      1.2,
+      2.4,
+      3.6,
+      4.8
+    };
+    public static final double[] kMaxAngularSpeedStages = {
+      0.5 * Math.PI,
+      Math.PI,
+      1.5 * Math.PI,
+      2.0 * Math.PI
+    };
+    public static final int kTeleopDefaultSpeedStage = 0;
+    public static final int kAutonDefaultSpeedStage = 4;
 
     public static final double kDirectionSlewRate = Math.PI; // radians per second
     //public static final double kDirectionFastSlewRate = 3.6; // When the bumper is pressed

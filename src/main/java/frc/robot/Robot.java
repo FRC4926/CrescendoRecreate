@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 /**
@@ -58,6 +59,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_robotContainer.m_robotDrive.setSpeedStage(DriveConstants.kAutonDefaultSpeedStage);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     /*
@@ -79,6 +81,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.m_robotDrive.setSpeedStage(DriveConstants.kTeleopDefaultSpeedStage);
     SmartDashboard.putNumber("PIDTurning", ModuleConstants.kTurningP);
     //SmartDashboard.putNumber("PIDTurningFL", ModuleConstants.FLTurningP);  
     // This makes sure that the autonomous stops running when
