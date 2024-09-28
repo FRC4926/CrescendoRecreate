@@ -75,11 +75,15 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
     // Decrement speed stage on dpad left
-    new POVButton(m_driverController, 270)
-        .onTrue(new RunCommand(() -> m_robotDrive.decrementSpeedStage(), m_robotDrive));
-    // Increment speed stage on dpad right
-    new POVButton(m_driverController, 270)
-        .onTrue(new RunCommand(() -> m_robotDrive.incrementSpeedStage(), m_robotDrive));
+    // new JoystickButton(m_driverController, m_driverController.getAButtonReleased().get)
+    //     .onTrue(new RunCommand(
+    //         () -> m_robotDrive.decrementSpeedStage(),
+    //         m_robotDrive));
+
+    // // Increment speed stage on dpad right
+    // new JoystickButton(m_driverController, Button.kB.value)
+    //     .onTrue(new RunCommand(() -> m_robotDrive.incrementSpeedStage(), 
+    //     m_robotDrive));
   }
 
   /**

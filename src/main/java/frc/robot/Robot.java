@@ -82,7 +82,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     m_robotContainer.m_robotDrive.setSpeedStage(DriveConstants.kTeleopDefaultSpeedStage);
-    SmartDashboard.putNumber("PIDTurning", ModuleConstants.kTurningP);
     //SmartDashboard.putNumber("PIDTurningFL", ModuleConstants.FLTurningP);  
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -96,8 +95,14 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    ModuleConstants.kTurningP = SmartDashboard.getNumber("PIDTurning", ModuleConstants.kTurningP);
+    SmartDashboard.putNumber("SpeedState", m_robotContainer.m_robotDrive.getSpeedStage());
     //ModuleConstants.FLTurningP = SmartDashboard.getNumber("PIDTurningFL", ModuleConstants.kTurningP);
+    if (m_robotContainer.m_driverController.getBButtonReleased()) {
+      m_robotContainer.m_robotDrive.incrementSpeedStage(); // When pressed the intake turns on
+   }
+   if (m_robotContainer.m_driverController.getXButtonReleased()) {
+      m_robotContainer.m_robotDrive.decrementSpeedStage(); // When released the intake turns off
+   }
   }
 
   @Override
