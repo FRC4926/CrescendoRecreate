@@ -69,6 +69,7 @@ public final class Constants {
     public static final int kFrontRightEncoderCanId = 11;
     public static final int kRearRightEncoderCanId = 12;
 
+
     public static final double kOrientationP = 1.0;
     public static final double kOrientationI = 0.0;
     public static final double kOrientationD = 0.0;
@@ -131,7 +132,13 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
+  }
+
+  public static final class LEDConstants {
+    public static final int kCanID = 59;
+    public static final int kStripLength = 15;
   }
 
   public static final class AutoConstants {
@@ -144,6 +151,9 @@ public final class Constants {
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
 
+    public static final double kSubwooferTopRPM = 2400.0;
+    public static final double kLowerMotorTargetRPM = 3000.0;
+
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
@@ -154,10 +164,16 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kUpperMotorCanId = 1234;
-    public static final int kLowerMotorCanId = 5678;
-    public static final int kConveyorMotorCanId = 15;
-    public static final int kIntakeMotorCanId = 39230329;
+    public static final int kConveyorMotorCanId = 14;
+    public static final int kIntakeMotorCanId = 13;
+    public static final int kLowerMotorCanId = 15;
+    public static final int kUpperMotorCanId = 16;
+    public static final int kDistanceSensorId = 1;
+
+    public static final int kConveyorMotorCurrentLimit = 60;
+    public static final int kIntakeMotorCurrentLimit = 60;
+    public static final int kLowerMotorCurrentLimit = 55;
+    public static final int kUpperMotorCurrentLimit = 55;
 
     public static final double kUpperMotorP = 1.0;
     public static final double kUpperMotorI = 0.0;
@@ -166,6 +182,16 @@ public final class Constants {
     public static final double kLowerMotorP = 1.0;
     public static final double kLowerMotorI = 0.0;
     public static final double kLowerMotorD = 0.0;
+
+    public static final double kTolerance = 30.0;
+    public static double SteadySpeedRPM = 2500;
+
+    public static final double kFullSendVoltageScale = 1.2;
+
+    public static final int kDistanceSensorAverageBits = 2;
+
+    public static final double intakeEffort = -0.2;
+    public static final double conveyorEffort = 0.2;
   }
 
   public static final class ArmConstants {

@@ -18,12 +18,12 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
@@ -37,10 +37,11 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final ShooterSubsystem m_robotShooter = new ShooterSubsystem();
-  public final ArmSubsystem m_robotArm = new ArmSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -65,15 +66,6 @@ public class RobotContainer {
                 // m_robotShooter.convey(2*(rt-0.5));
             },
             m_robotDrive));
-    
-    m_robotArm.setDefaultCommand(new RunCommand(() -> {
-        if (m_driverController.getPOV() != -1) {
-            m_robotArm.reset();
-        }
-
-        final double rt = m_driverController.getRightTriggerAxis();
-        m_robotArm.goToAngle(Rotation2d.fromRotations(rt));
-    }, m_robotArm));
   }
 
   /**
@@ -86,11 +78,29 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
+    m_driverController.rightBumper()
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+
+    m_operatorController.leftBumper()
+        .whileTrue(new RunCommand(
+            () -> m_robotShooter.outake(),
+            m_robotShooter));
+    
+    m_operatorController.leftTrigger(0.2)
+        .whileTrue(new RunCommand(
+            () -> m_robotShooter.intake(),
+            m_robotShooter));
+
+    m_operatorController.rightTrigger(0.2)
+        .whileTrue(new RunCommand(
+            () -> m_robotShooter.shoot(),
+            m_robotShooter));
+
   }
+
+  
 
   /**
    * Use this to pass the autonomous command to the !main {@link Robot} class.
