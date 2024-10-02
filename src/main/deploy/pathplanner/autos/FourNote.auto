@@ -1,0 +1,67 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.26,
+      "y": 5.56
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote7"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourNote8"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
