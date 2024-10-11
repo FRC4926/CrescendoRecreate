@@ -1,51 +1,135 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems;
-import com.revrobotics.AbsoluteEncoder;
+
+import java.util.function.Consumer;
+
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.WPIMathJNI;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog.State;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ArmConstants;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.RobotContainer;
+
 
 public class ArmSubsystem extends SubsystemBase {
-    private final CANSparkMax armSparkMax = new CANSparkMax(ArmConstants.kArmMotorCanId, MotorType.kBrushless);
-    private final RelativeEncoder armEncoder = armSparkMax.getEncoder();
-    private final PIDController armPIDController = new PIDController(
-        ArmConstants.kArmMotorP, ArmConstants.kArmMotorI, ArmConstants.kArmMotorD
-    );
-    private final double startTime = WPIUtilJNI.now();
-    private double setpoint = 0.0;
-    public ArmSubsystem() {
-        armEncoder.setPosition(0.0);
-        armEncoder.setPositionConversionFactor(1);
-    }
-    public void reset() {
-        armEncoder.setPosition(0.0);
-    }
-    // Go to angle in radians
-    public void goToAngle(double angleRadians) {
-        goToAngle(Rotation2d.fromRadians(angleRadians));
-    }
-    public void goToAngle(Rotation2d angle) {
-        setpoint = angle.getRotations();
-    }
-    public boolean atAngle() {
-        return armPIDController.atSetpoint();
-    }
-    public void periodic() {
-        double output = armEncoder.getPosition();
-        double input = armPIDController.calculate(output, setpoint);
-        // armSparkMax.set(armPIDController.calculate(armEncoder.getPosition(), setpoint));
-        SmartDashboard.putNumber("armOutput", output);
-        SmartDashboard.putNumber("armInput", input);
-    }
-    public void sendData() {
+  /** Creates a new ArmSubsystem. */
+  double p = 9;
+  double i = 0;
+  double d = 0;
+  double ffVelocity = 1;
+  // how often we want to update our trapezoidal profiling
+  double dT = 0.02;
+  public double targetAngle = 0;
+  //ArmFeedforward ff = new ArmFeedforward(0, 1.32, 1.95, 0.07);
+  public ArmFeedforward ff = new ArmFeedforward(0, 1.1, 0, 0);
+  public CANSparkMax armMotor = new CANSparkMax(Constants.ArmConstants.kArmMotorCanId, MotorType.kBrushless);
+  public int slackBool = 1;
+  public double angle = armMotor.getEncoder().getPosition();
+  public PIDController armController = new PIDController(p, i, d);
+  Timer timer = new Timer();
+  public ArmSubsystem() {
+ 
+    armMotor.restoreFactoryDefaults();
+    // armMotor2.restoreFactoryDefaults();
 
+    armMotor.setIdleMode(IdleMode.kBrake);
+    // armMotor2.setIdleMode(IdleMode.kBrake);
+
+    armMotor.setInverted(true);
+
+    armMotor.getEncoder().setPositionConversionFactor((2*Math.PI)*(0.01));
+    // armMotor2.getEncoder().setPositionConversionFactor(Constants.Robot.shoulderGearRatio*360);
+
+
+
+    armMotor.setSmartCurrentLimit(55);
+    // armMotor2.getEncoder().setPosition(Constants.Robot.initialShoulderAngle);
+
+  }
+
+
+  public void resetTimer(){
+    timer.reset();
+    timer.start();
+  }
+  public boolean slackOver(){
+    return timer.get()>1;
+  }
+
+  public void defaultArm()
+  {
+    if(!slackOver()){
+        //Subsystems.m_armSubsystem.changeSlackBool(0);
+        armMotor.set(0.06);
+        armMotor.getEncoder().setPosition(-30 * (Math.PI / 180));
+      }else{
+        armMotor.set(0);
+        //armMotor.goToHomePositionConstantEffort();
+      }
+  }
+
+  
+
+
+  public void goToSpecifiedAngleAmp(double angle) {
+    //if(!(Subsystems.m_limelightSubsystem.getID()==-1)){
+    angle = angle*(Math.PI/180);
+    
+    targetAngle = angle;
+    
+
+    // Controllers.m_operatorController.setRumble(RumbleType.kBothRumble, 0);
+    armController.setSetpoint(targetAngle);
+    SmartDashboard.putNumber("AngleOfArm", Math.toDegrees(targetAngle));
+    // SmartDashboard.putNumber("Predicted Feedforward", ff.calculate(targetAngle, ffVelocity));
+    // SmartDashboard.putNumber("Predicted PID", armController.calculate(armMotor.getEncoder().getPosition(), targetAngle));
+   armMotor.setVoltage((armController.calculate(armMotor.getEncoder().getPosition(), targetAngle) + ff.calculate(targetAngle, ffVelocity)));
+  }
+
+  public void manualControl(double input) {
+    if (input > 0 && armMotor.getEncoder().getPosition() >= Constants.ArmConstants.ampAngle)
+    {
+       armMotor.set(0);
+    } else 
+      armMotor.set(input);
+  }
+
+  public boolean isFinished(double targetAngle){
+    return Math.abs(Math.toDegrees(armMotor.getEncoder().getPosition())-targetAngle)<1.5;
+  }
+  public void goToHomePositionConstantEffort()
+  {
+    if(armMotor.getEncoder().getPosition()*180/Math.PI>-10)
+    {
+      armMotor.set(-0.3);
     }
+    else if(armMotor.getEncoder().getPosition()*180/Math.PI>-20){
+      armMotor.set(-.1);
+    }else{
+      armMotor.set(0);
+    }
+  }
+  @Override
+  public void periodic() {
+    if(slackOver()){
+      timer.stop();
+    }
+    // This method will be called once per scheduler run
+  }
 }

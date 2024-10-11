@@ -45,6 +45,13 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    SmartDashboard.putNumber("DistanceSensor", m_robotContainer.m_robotShooter.getDistanceValue());  
+    SmartDashboard.putNumber("UpperRPM", m_robotContainer.m_robotShooter.upperMotorRPM());  
+    SmartDashboard.putNumber("LowerPM", m_robotContainer.m_robotShooter.lowerMotorRPM());  
+    SmartDashboard.putNumber("UpperCurrent", m_robotContainer.m_robotShooter.conveyorMotor.getOutputCurrent());  
+    SmartDashboard.putNumber("LowerCurrent", m_robotContainer.m_robotShooter.lowerShooterMotor.getOutputCurrent());  
+    SmartDashboard.putNumber("IntakeRPM", m_robotContainer.m_robotShooter.intakeMotorRPM());  
+
     CommandScheduler.getInstance().run();
   }
 
@@ -58,6 +65,10 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_robotContainer.m_robotShooter.intakeMotor.set(0);
+    m_robotContainer.m_robotShooter.upperShooterMotor.set(-0.5);
+    m_robotContainer.m_robotShooter.lowerShooterMotor.set(0.5);
+    m_robotContainer.m_robotShooter.conveyorMotor.set(0);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     /*
@@ -79,7 +90,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    SmartDashboard.putNumber("PIDTurning", ModuleConstants.kTurningP);
+    //SmartDashboard.putNumber("PIDTurning", ModuleConstants.kTurningP);
     //SmartDashboard.putNumber("PIDTurningFL", ModuleConstants.FLTurningP);  
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -93,8 +104,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    ModuleConstants.kTurningP = SmartDashboard.getNumber("PIDTurning", ModuleConstants.kTurningP);
+    //ModuleConstants.kTurningP = SmartDashboard.getNumber("PIDTurning", ModuleConstants.kTurningP);
     //ModuleConstants.FLTurningP = SmartDashboard.getNumber("PIDTurningFL", ModuleConstants.kTurningP);
+
   }
 
   @Override

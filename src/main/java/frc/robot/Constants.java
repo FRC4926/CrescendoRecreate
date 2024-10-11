@@ -53,7 +53,7 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = 0;//Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 1000;
+    public static final int kFrontLeftDrivingCanId = 1;
     public static final int kRearLeftDrivingCanId = 2;
     public static final int kFrontRightDrivingCanId = 3;
     public static final int kRearRightDrivingCanId = 4;
@@ -108,14 +108,14 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    public static final double kDrivingP = 0.04;
+    public static final double kDrivingP = 0.06;
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
     public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
-    public static double kTurningP = 3;
+    public static double kTurningP = 4;
     public static double kTurningI = 0;
     public static double kTurningD = 0;
     //public static double FLTurningP = 2;
@@ -168,18 +168,18 @@ public final class Constants {
     public static final int kIntakeMotorCanId = 13;
     public static final int kLowerMotorCanId = 15;
     public static final int kUpperMotorCanId = 16;
-    public static final int kDistanceSensorId = 1;
+    public static final int kDistanceSensorId = 0;
 
     public static final int kConveyorMotorCurrentLimit = 60;
-    public static final int kIntakeMotorCurrentLimit = 60;
+    public static final int kIntakeMotorCurrentLimit = 90;
     public static final int kLowerMotorCurrentLimit = 55;
     public static final int kUpperMotorCurrentLimit = 55;
 
-    public static final double kUpperMotorP = 1.0;
+    public static final double kUpperMotorP = 0.5;
     public static final double kUpperMotorI = 0.0;
     public static final double kUpperMotorD = 0.0;
 
-    public static final double kLowerMotorP = 1.0;
+    public static final double kLowerMotorP = 0.5;
     public static final double kLowerMotorI = 0.0;
     public static final double kLowerMotorD = 0.0;
 
@@ -190,16 +190,18 @@ public final class Constants {
 
     public static final int kDistanceSensorAverageBits = 2;
 
-    public static final double intakeEffort = -0.2;
-    public static final double conveyorEffort = 0.2;
+    public static final double intakeEffort = 0.75;
+    public static final double conveyorEffort = 0.7;
   }
 
   public static final class ArmConstants {
-    public static final int kArmMotorCanId = 1;
+    public static final int kArmMotorCanId = 20;
 
     public static final double kArmMotorP = 0.2;
     ;
     public static final double kArmMotorI = 0.0;
     public static final double kArmMotorD = 0.0;
+
+    public static final double ampAngle = 95;
   }
 }

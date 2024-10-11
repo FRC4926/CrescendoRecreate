@@ -125,7 +125,7 @@ public class DriveSubsystem extends SubsystemBase {
             this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                     new PIDConstants(.04, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(3.0, 0.0, 0.0), // Rotation PID constants
+                    new PIDConstants(4.0, 0.0, 0.0), // Rotation PID constants
                     4.8, // Max module speed, in m/s
                     0.3429, // Drive base radius in meters. Distance from robot center to furthest module.
                     new ReplanningConfig() // Default path replanning config. See the API for the options here
@@ -154,12 +154,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.periodic();
 
 
-    SmartDashboard.putNumber("FrontLeftPosition",  m_frontLeft.getAbsolutePositionEncoder()*(180/Math.PI));
-    SmartDashboard.putNumber("FrontRightPosition", m_frontRight.getAbsolutePositionEncoder()*(180/Math.PI));
-    SmartDashboard.putNumber("RearLeftPosition",   m_rearLeft.getAbsolutePositionEncoder()*(180/Math.PI));
-    SmartDashboard.putNumber("RearRightPosition",  m_rearRight.getAbsolutePositionEncoder()*(180/Math.PI));
-    SmartDashboard.putNumber("Gyro Postion",       m_gyro.getYaw().getValueAsDouble());
-    SmartDashboard.putString("Odemetry Angle",     m_odometry.getPoseMeters().getRotation().toString());
+    // SmartDashboard.putNumber("FrontLeftPosition",  m_frontLeft.getAbsolutePositionEncoder()*(180/Math.PI));
+    // SmartDashboard.putNumber("FrontRightPosition", m_frontRight.getAbsolutePositionEncoder()*(180/Math.PI));
+    // SmartDashboard.putNumber("RearLeftPosition",   m_rearLeft.getAbsolutePositionEncoder()*(180/Math.PI));
+    // SmartDashboard.putNumber("RearRightPosition",  m_rearRight.getAbsolutePositionEncoder()*(180/Math.PI));
+    // SmartDashboard.putNumber("Gyro Postion",       m_gyro.getYaw().getValueAsDouble());
+    // SmartDashboard.putString("Odemetry Angle",     m_odometry.getPoseMeters().getRotation().toString());
 
     // Update the odometry in the periodic block
     m_odometry.update(
@@ -272,13 +272,13 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedCommanded;
     double ySpeedCommanded;
 
-    if (Math.abs(xSpeed) <= 0.05 && Math.abs(ySpeed) <= 0.05 && Math.abs(rot) <= 0.05) {
-      m_frontLeft.stopMotor();
-      m_frontRight.stopMotor();
-      m_rearLeft.stopMotor();
-      m_rearRight.stopMotor();
-      return;
-    }
+    // if (Math.abs(xSpeed) <= 0.05 && Math.abs(ySpeed) <= 0.05 && Math.abs(rot) <= 0.05) {
+    //   m_frontLeft.stopMotor();
+    //   m_frontRight.stopMotor();
+    //   m_rearLeft.stopMotor();
+    //   m_rearRight.stopMotor();
+    //   return;
+    // }
     if (rateLimit) {
       // Convert XY to polar for rate limiting
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);

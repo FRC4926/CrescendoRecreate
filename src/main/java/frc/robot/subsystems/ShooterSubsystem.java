@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -16,10 +17,10 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
-    private CANSparkMax conveyorMotor = new CANSparkMax(ShooterConstants.kConveyorMotorCanId, MotorType.kBrushless);
-    private CANSparkMax intakeMotor = new CANSparkMax(ShooterConstants.kIntakeMotorCanId, MotorType.kBrushless);
-    private CANSparkMax lowerShooterMotor = new CANSparkMax(ShooterConstants.kLowerMotorCanId, MotorType.kBrushless);
-    private CANSparkMax upperShooterMotor = new CANSparkMax(ShooterConstants.kUpperMotorCanId, MotorType.kBrushless);
+    public CANSparkMax conveyorMotor = new CANSparkMax(ShooterConstants.kConveyorMotorCanId, MotorType.kBrushless);
+    public CANSparkMax intakeMotor = new CANSparkMax(ShooterConstants.kIntakeMotorCanId, MotorType.kBrushless);
+    public CANSparkMax lowerShooterMotor = new CANSparkMax(ShooterConstants.kLowerMotorCanId, MotorType.kBrushless);
+    public CANSparkMax upperShooterMotor = new CANSparkMax(ShooterConstants.kUpperMotorCanId, MotorType.kBrushless);
     public AnalogInput distanceSensor = new AnalogInput(Constants.ShooterConstants.kDistanceSensorId);
     
     private PIDController lowerPIDController = new PIDController(
@@ -29,13 +30,17 @@ public class ShooterSubsystem extends SubsystemBase {
         ShooterConstants.kUpperMotorP, ShooterConstants.kUpperMotorI, ShooterConstants.kUpperMotorD
     );
 
+    private PIDController intakePID = new PIDController(
+        0.01,0, 0
+    );
+
     private double targetRPM = Constants.ShooterConstants.SteadySpeedRPM;
 
     public ShooterSubsystem() {
         resetMotors();
 
         conveyorMotor.setIdleMode(IdleMode.kBrake);
-        intakeMotor.setIdleMode(IdleMode.kBrake);
+        intakeMotor.setIdleMode(IdleMode.kCoast);
         lowerShooterMotor.setIdleMode(IdleMode.kCoast);
         upperShooterMotor.setIdleMode(IdleMode.kCoast);
 
@@ -44,13 +49,14 @@ public class ShooterSubsystem extends SubsystemBase {
         lowerShooterMotor.setSmartCurrentLimit(ShooterConstants.kLowerMotorCurrentLimit);
         upperShooterMotor.setSmartCurrentLimit(ShooterConstants.kUpperMotorCurrentLimit);
 
-        // NOTE I think this makes the motors accelerate as fast as possible. How safe is
-        // this for the motors?
-        lowerShooterMotor.setOpenLoopRampRate(0);
-        upperShooterMotor.setOpenLoopRampRate(0);
+        // // NOTE I think this makes the motors accelerate as fast as possible. How safe is
+        // // this for the motors?
+        lowerShooterMotor.setOpenLoopRampRate(0.0);
+        upperShooterMotor.setOpenLoopRampRate(0.0);
 
         lowerPIDController.setTolerance(ShooterConstants.kTolerance);
         upperPIDController.setTolerance(ShooterConstants.kTolerance);
+        intakePID.setTolerance(ShooterConstants.kTolerance);
 
         // distanceSensor.setAverageBits(ShooterConstants.kDistanceSensorAverageBits);
     }
@@ -58,15 +64,20 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() 
     {
-        if(isFinished(100))
-          RPMShoot(targetRPM, targetRPM);  
-        else
-            fullSend();
+
     }
 
     public void shoot()
     {
         conveyorMotor.set(Constants.ShooterConstants.conveyorEffort);
+        intakeMotor.set(Constants.ShooterConstants.intakeEffort);
+    }
+
+    public void autonShoot()
+    {
+        conveyorMotor.set(Constants.ShooterConstants.conveyorEffort);
+        intakeMotor.set(Constants.ShooterConstants.intakeEffort);
+        fullSend();
     }
 
     public void resetMotors() {
@@ -76,6 +87,9 @@ public class ShooterSubsystem extends SubsystemBase {
         upperShooterMotor.restoreFactoryDefaults();
     }
 
+    public double intakeMotorRPM() {
+        return intakeMotor.getEncoder().getVelocity();
+    }
     public double lowerMotorRPM() {
         return lowerShooterMotor.getEncoder().getVelocity();
     }
@@ -83,11 +97,26 @@ public class ShooterSubsystem extends SubsystemBase {
         return upperShooterMotor.getEncoder().getVelocity();
     }
 
+    public double conveyorMotorRPM() {
+        return conveyorMotor.getEncoder().getVelocity();
+    }
+
+
     public void intake() {
-        if (getDistanceTriggered() > 0.75)
+        if (getDistanceValue() <= 1.2)
         {
+            // if (intakeMotorRPM() < 1500)
+            // {
+            //     intakeMotor.set(0.75);
+            // }
+            // else
+            // {
+            //     intakeMotor.set(0);
+            // }
+
             intakeMotor.set(Constants.ShooterConstants.intakeEffort);
-            conveyorMotor.set(Constants.ShooterConstants.intakeEffort);
+            conveyorMotor.set(Constants.ShooterConstants.conveyorEffort);
+        
         } else
         {
             intakeMotor.set(0);
@@ -95,9 +124,20 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+    public void defaultShooter()
+    {
+        intakeMotor.set(0);
+        // upperShooterMotor.set(-0.5);
+        // lowerShooterMotor.set(0.5);
+        conveyorMotor.set(0);
+        // if(isFinished(100))
+        RPMShoot(targetRPM, targetRPM);  
+        // else
+        //     fullSend();
+    }
     public void outake()
     {
-        intakeMotor.set(Constants.ShooterConstants.intakeEffort/2.0);
+        intakeMotor.set(-Constants.ShooterConstants.intakeEffort/2.0);
         conveyorMotor.set(Constants.ShooterConstants.conveyorEffort/2.0);
     }
 
@@ -105,10 +145,17 @@ public class ShooterSubsystem extends SubsystemBase {
         conveyorMotor.set(Constants.ShooterConstants.conveyorEffort);
     }
 
-    public double getDistanceTriggered()
+    public double getDistanceValue()
     {
         return distanceSensor.getAverageVoltage();
     }
+
+    public boolean isFinishedAuton(double target)
+    {
+      return (Math.abs(lowerMotorRPM()) >= Math.abs((target - Constants.ShooterConstants.kTolerance)));
+    }
+
+
     
 
 
@@ -149,5 +196,11 @@ public class ShooterSubsystem extends SubsystemBase {
     // isFinishedAuton(double target) is now isFinished(double offset) (they do the same exact thing)
     public boolean isFinishedAuton() {
         return isFinished(AutoConstants.kSubwooferTopRPM);
+    }
+
+    //TODO: delete
+    public Command exampleMethodCommand() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'exampleMethodCommand'");
     }
 }

@@ -199,8 +199,8 @@ public class MAXSwerveModule {
     // m_turningPIDController.setSetpoint(optimizedDesiredState.angle.getRotations());
     m_turningSetpoint = optimizedDesiredState.angle.getRotations();
 
-    SmartDashboard.putNumber(m_name + "DesiredSpeed", optimizedDesiredState.speedMetersPerSecond);
-    SmartDashboard.putNumber(m_name + "DesiredOrientation", optimizedDesiredState.angle.getDegrees());
+    // SmartDashboard.putNumber(m_name + "DesiredSpeed", optimizedDesiredState.speedMetersPerSecond);
+    // SmartDashboard.putNumber(m_name + "DesiredOrientation", optimizedDesiredState.angle.getDegrees());
 
     m_desiredState = desiredState;
     m_optimizedDesiredState = optimizedDesiredState;
@@ -230,10 +230,10 @@ public class MAXSwerveModule {
     // }
 
     double absolutePosition = m_turningEncoder.getAbsolutePosition().getValueAsDouble();
-    SmartDashboard.putNumber(m_name + "absolutePositionRotations", absolutePosition);
+    //SmartDashboard.putNumber(m_name + "absolutePositionRotations", absolutePosition);
     
     double calculated = m_turningPIDController.calculate(absolutePosition, m_turningSetpoint);
-    SmartDashboard.putNumber(m_name + "PIDCalculated", calculated);
+    //SmartDashboard.putNumber(m_name + "PIDCalculated", calculated);
     m_turningSparkMax.set(calculated);
   }
 

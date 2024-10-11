@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import com.fasterxml.jackson.core.sym.Name;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
@@ -13,6 +15,10 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AutonIntakeCommand;
+import frc.robot.commands.AutonShooterCommand;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -32,8 +38,9 @@ import frc.robot.subsystems.DriveSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems
-  public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  public final ShooterSubsystem m_robotShooter = new ShooterSubsystem();
+  public static final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public static final ShooterSubsystem m_robotShooter = new ShooterSubsystem();
+  public static final ArmSubsystem m_armDrive = new ArmSubsystem();
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -45,6 +52,10 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the button bindings
+    NamedCommands.registerCommand("Intake" ,new AutonIntakeCommand());
+    NamedCommands.registerCommand("Shoot" ,new AutonShooterCommand());
+
+    
     configureButtonBindings();
 
     // Configure default commands
@@ -52,16 +63,24 @@ public class RobotContainer {
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
-            () -> m_robotDrive.drive(
+            () -> {
+              m_robotDrive.drive(
                 -MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true, true);
-
-                // final double rt = m_driverController.getRightTriggerAxis();
-                // m_robotShooter.convey(2*(rt-0.5));
+                -MathUtil.applyDeadband(-m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                true, false);
             },
             m_robotDrive));
+
+    // Configure default commands
+    m_robotShooter.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () -> {
+              m_robotShooter.defaultShooter();
+            },
+            m_robotShooter));
   }
 
   /**
@@ -84,7 +103,7 @@ public class RobotContainer {
             () -> m_robotShooter.outake(),
             m_robotShooter));
     
-    m_operatorController.leftTrigger(0.2)
+    m_operatorController.leftTrigger(0.5)
         .whileTrue(new RunCommand(
             () -> m_robotShooter.intake(),
             m_robotShooter));
@@ -105,7 +124,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-    return new PathPlannerAuto("FourNote");
+    return new PathPlannerAuto("CenterTwoNote");
 
     // // Create config for trajectory
     // TrajectoryConfig config = new TrajectoryConfig(
