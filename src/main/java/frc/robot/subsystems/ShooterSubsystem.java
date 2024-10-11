@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -71,6 +72,8 @@ public class ShooterSubsystem extends SubsystemBase {
     {
         conveyorMotor.set(Constants.ShooterConstants.conveyorEffort);
         intakeMotor.set(Constants.ShooterConstants.intakeEffort);
+        lowerShooterMotor.set(-1);
+        upperShooterMotor.set(-1);
     }
 
     public void autonShoot()
@@ -127,11 +130,11 @@ public class ShooterSubsystem extends SubsystemBase {
     public void defaultShooter()
     {
         intakeMotor.set(0);
-        // upperShooterMotor.set(-0.5);
-        // lowerShooterMotor.set(0.5);
+        upperShooterMotor.set(-0.5);
+        lowerShooterMotor.set(-0.5);
         conveyorMotor.set(0);
         // if(isFinished(100))
-        RPMShoot(targetRPM, targetRPM);  
+        //RPMShoot(targetRPM, targetRPM);  
         // else
         //     fullSend();
     }
@@ -166,8 +169,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void RPMShoot(double lower, double upper) {
         double lowerSetpoint = lowerPIDController.calculate(lowerMotorRPM(), -lower);
-        double upperSetpoint = upperPIDController.calculate(upperMotorRPM(), -upper);
+        //SmartDashboard.putNumber("lowerMotorVoltage", lowerSetpoint);
+        SmartDashboard.putNumber("lowerMotorVoltage", lowerShooterMotor.getAppliedOutput());
 
+        double upperSetpoint = upperPIDController.calculate(upperMotorRPM(), -upper);
+        SmartDashboard.putNumber("upperMotorVoltage", upperShooterMotor.getAppliedOutput());
+        
         lowerShooterMotor.setVoltage(lowerSetpoint);
         upperShooterMotor.setVoltage(upperSetpoint);
     }
