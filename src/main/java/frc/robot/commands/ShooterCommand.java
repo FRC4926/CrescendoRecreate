@@ -18,7 +18,7 @@ public class ExampleCommand extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ExampleCommand(ShooterSubsystem subsystem) {
+  public ShooterCommand(ShooterSubsystem subsystem) {
     m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -26,11 +26,27 @@ public class ExampleCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if ((RobotContainer.m_operatorController.getLeftTriggerAxis()) > .2)
+    {
+      RobotContainer.m_robotShooter.intake();
+    } else if ((RobotContainer.m_operatorController.getRightTriggerAxis()) > .2)
+    {
+      RobotContainer.m_robotShooter.shoot();
+    } else if (ontrollers.m_operatorController.getLeftBumper())
+    {
+      RobotContainer.m_robotShooter.outake();
+    } else
+    {
+      RobotContainer.m_robotShooter.defaultShooter();
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override

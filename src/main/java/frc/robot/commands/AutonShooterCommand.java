@@ -40,7 +40,10 @@ public class AutonShooterCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    RobotContainer.m_robotShooter.lowerShooterMotor.set(0);
+    RobotContainer.m_robotShooter.upperShooterMotor.set(0);
+  }
 
   // Returns true when the command should end.
   @Override

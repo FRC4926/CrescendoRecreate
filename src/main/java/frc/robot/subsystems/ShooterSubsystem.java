@@ -65,6 +65,20 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() 
     {
+        //worst case
+        // if ((RobotContainer.m_operatorController.getLeftTriggerAxis()) > .2)
+        // {
+        //   RobotContainer.m_robotShooter.intake();
+        // } else if ((RobotContainer.m_operatorController.getRightTriggerAxis()) > .2)
+        // {
+        //   RobotContainer.m_robotShooter.shoot();
+        // } else if (ontrollers.m_operatorController.getLeftBumper())
+        // {
+        //   RobotContainer.m_robotShooter.outake();
+        // } else
+        // {
+        //   RobotContainer.m_robotShooter.defaultShooter();
+        // }
 
     }
 
@@ -106,17 +120,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
     public void intake() {
-        if (getDistanceValue() <= 1.2)
+        if (getDistanceValue() <= Constants.ShooterCommand.distanceThreshold)
         {
-            // if (intakeMotorRPM() < 1500)
-            // {
-            //     intakeMotor.set(0.75);
-            // }
-            // else
-            // {
-            //     intakeMotor.set(0);
-            // }
-
             intakeMotor.set(Constants.ShooterConstants.intakeEffort);
             conveyorMotor.set(Constants.ShooterConstants.conveyorEffort);
         

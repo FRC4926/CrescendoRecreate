@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.commands.ShooterCommand;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -42,9 +43,12 @@ public class RobotContainer {
   public static final ShooterSubsystem m_robotShooter = new ShooterSubsystem();
   public static final ArmSubsystem m_armDrive = new ArmSubsystem();
 
+  //commands
+  public static final ShooterCommand = m_shooterCommand = new ShooterCommand();
+
   // The driver's controller
-  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
-  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
+  public CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  public CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
 
   /**
@@ -73,14 +77,14 @@ public class RobotContainer {
             m_robotDrive));
 
     // Configure default commands
-    m_robotShooter.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> {
-              m_robotShooter.defaultShooter();
-            },
-            m_robotShooter));
+    // m_robotShooter.setDefaultCommand(
+    //     // The left stick controls translation of the robot.
+    //     // Turning is controlled by the X axis of the right stick.
+    //     new RunCommand(
+    //         () -> {
+    //           m_robotShooter.defaultShooter();
+    //         },
+    //         m_robotShooter));
   }
 
   /**
@@ -98,20 +102,20 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    m_operatorController.leftBumper()
-        .whileTrue(new RunCommand(
-            () -> m_robotShooter.outake(),
-            m_robotShooter));
+    // m_operatorController.leftBumper()
+    //     .whileTrue(new RunCommand(
+    //         () -> m_robotShooter.outake(),
+    //         m_robotShooter));
     
-    m_operatorController.leftTrigger(0.5)
-        .whileTrue(new RunCommand(
-            () -> m_robotShooter.intake(),
-            m_robotShooter));
+    // m_operatorController.leftTrigger(0.5)
+    //     .whileTrue(new RunCommand(
+    //         () -> m_robotShooter.intake(),
+    //         m_robotShooter));
 
-    m_operatorController.rightTrigger(0.2)
-        .whileTrue(new RunCommand(
-            () -> m_robotShooter.shoot(),
-            m_robotShooter));
+    // m_operatorController.rightTrigger(0.2)
+    //     .whileTrue(new RunCommand(
+    //         () -> m_robotShooter.shoot(),
+    //         m_robotShooter));
 
   }
 
@@ -124,7 +128,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-    return new PathPlannerAuto("CenterTwoNote");
+    return CenterTwoNote.getCommand();
 
     // // Create config for trajectory
     // TrajectoryConfig config = new TrajectoryConfig(

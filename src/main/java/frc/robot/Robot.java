@@ -104,6 +104,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    CommandScheduler.getInstance().schedule(RobotContainer.m_shooterCommand());
     //ModuleConstants.kTurningP = SmartDashboard.getNumber("PIDTurning", ModuleConstants.kTurningP);
     //ModuleConstants.FLTurningP = SmartDashboard.getNumber("PIDTurningFL", ModuleConstants.kTurningP);
 

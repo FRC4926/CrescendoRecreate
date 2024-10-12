@@ -175,11 +175,11 @@ public final class Constants {
     public static final int kLowerMotorCurrentLimit = 55;
     public static final int kUpperMotorCurrentLimit = 55;
 
-    public static final double kUpperMotorP = 0.5;
+    public static final double kUpperMotorP = 0.01;
     public static final double kUpperMotorI = 0.0;
     public static final double kUpperMotorD = 0.0;
 
-    public static final double kLowerMotorP = 0.5;
+    public static final double kLowerMotorP = 0.01;
     public static final double kLowerMotorI = 0.0;
     public static final double kLowerMotorD = 0.0;
 
@@ -192,6 +192,8 @@ public final class Constants {
 
     public static final double intakeEffort = 0.75;
     public static final double conveyorEffort = 0.7;
+
+    public static final double distanceThreshold = 1.2;
   }
 
   public static final class ArmConstants {
